@@ -1,35 +1,69 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Box } from '@mui/material';
 
-function App() {
-  const [count, setCount] = useState(0)
+// Page Imports
+import Landing from "./pages/Landing";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";   
+import Maintenance from "./pages/Maintenance"; 
+
+// Component Imports
+import Footer from "./components/Layout/Footer";
+
+/**
+ * Main Application Component
+ */
+export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const location = useLocation();
+
+  // Logic: We don't want the Footer to show up on the Dashboard or Maintenance 
+  // because those pages usually have their own internal Sidebar navigation.
+  const hideFooterRoutes = ['/dashboard', '/maintenance', '/chat'];
+  const shouldShowFooter = !hideFooterRoutes.includes(location.pathname);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Box 
+      sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: '100vh',
+        bgcolor: 'background.default' 
+      }}
+    >
+      {/* Main Content Area */}
+      <Box component="main" sx={{ flex: 1 }}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Landing />} />
+          <Route path="/home" element={<Home />} />
+          
+          {/* Auth Route - Passes state setter to Login component */}
+          <Route 
+            path="/login" 
+            element={<Login setIsLoggedIn={setIsLoggedIn} />} 
+          />
+          
+          {/* Protected Routes - Redirects to login if not authenticated */}
+          <Route 
+            path="/dashboard" 
+            element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />} 
+          />
+          
+          <Route 
+            path="/maintenance" 
+            element={isLoggedIn ? <Maintenance /> : <Navigate to="/login" />} 
+          />
 
-export default App
+          {/* Catch-all: Redirect unknown routes to Landing */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Box>
+
+      {/* Footer - Only shows on Landing, Home, and Login */}
+      {shouldShowFooter && <Footer />}
+    </Box>
+  );
+}
