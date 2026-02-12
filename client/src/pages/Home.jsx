@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 // Component Imports
 import NavBar from '../components/Layout/NavBar'; 
-import ListingCard from '../components/Forms/ListingCard'; // Integrated the new card
+import ListingCard from '../components/Forms/ListingCard'; 
 
 const Home = () => {
   const navigate = useNavigate();
@@ -21,16 +21,25 @@ const Home = () => {
   // Check if user is logged in for FAB visibility
   const token = localStorage.getItem('token');
 
-  // Fetch data from Flask API
+  // API Configuration - Define the base URL here for easy changes
+  const API_BASE_URL = 'http://127.0.0.1:5000'; 
+
   useEffect(() => {
     const fetchListings = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/listings');
-        if (!response.ok) throw new Error('Failed to fetch marketplace data');
+        // Using the full absolute address to avoid 404/Not Found errors
+        const response = await fetch(`${API_BASE_URL}/listings`);
+        
+        if (!response.ok) {
+           throw new Error(`Server responded with ${response.status}: Not Found`);
+        }
+        
         const data = await response.json();
         setItems(data);
+        setError(null); // Clear any previous errors
       } catch (err) {
+        console.error("Fetch error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -93,8 +102,10 @@ const Home = () => {
         {error && (
           <Box textAlign="center" py={10}>
             <ErrorOutline sx={{ fontSize: 60, color: 'error.main', mb: 2 }} />
-            <Typography variant="h6">TalaLink is having trouble connecting.</Typography>
-            <Typography color="text.secondary">Make sure your Flask server is running at port 5000.</Typography>
+            <Typography variant="h6">Cannot reach the TalaLink Server.</Typography>
+            <Typography color="text.secondary">
+              Check if your Flask app is running at <strong>{API_BASE_URL}</strong>
+            </Typography>
           </Box>
         )}
 

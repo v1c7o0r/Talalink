@@ -5,13 +5,15 @@ import { Box } from '@mui/material';
 // Page & Component Imports
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup"; // Added Signup
+import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Maintenance from "./pages/Maintenance";
-import CreateListing from "./components/Forms/CreateListing"; // Added CreateListing
-import Footer from "./components/Layout/Footer";
+import CreateListing from "./components/Forms/CreateListing";
 import ProductDetail from "./pages/ProductDetail";
+import VerifyEmail from "./pages/VerifyEmail"; // <--- ADD THIS IMPORT
+import Footer from "./components/Layout/Footer";
+
 /**
  * Main Application Component
  */
@@ -20,8 +22,9 @@ export default function App() {
   const [user, setUser] = useState(null); 
   const location = useLocation();
 
-  const hideFooterRoutes = ['/dashboard', '/maintenance', '/chat', '/create-listing'];
-  const shouldShowFooter = !hideFooterRoutes.includes(location.pathname);
+  // Added verify and product to hidden footer routes for a cleaner look
+  const hideFooterRoutes = ['/dashboard', '/maintenance', '/chat', '/create-listing', '/verify'];
+  const shouldShowFooter = !hideFooterRoutes.some(path => location.pathname.startsWith(path));
 
   // Helper to check if a token exists in local storage even if 'user' state is reset
   const isAuthenticated = user || localStorage.getItem('token');
@@ -36,6 +39,10 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          
+          {/* Email Verification Link from Backend */}
+          <Route path="/verify/:token" element={<VerifyEmail />} />
+
           {/* --- PROTECTED ROUTES --- */}
           {/* Redirect to login if not authenticated */}
           

@@ -35,35 +35,34 @@ const LocationPicker = ({ coords, setCoords }) => {
 
   return (
     <Box sx={{ width: '100%', mt: 2 }}>
-      {!isLoaded ? (
-        <Skeleton variant="rectangular" sx={{ ...containerStyle }} />
-      ) : (
-        <>
-          <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-            {coords 
-              ? `Selected: ${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}` 
-              : "Click the map to set workshop origin"}
-          </Typography>
-          <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={coords || center}
-            zoom={14}
-            onClick={onMapClick}
-            options={{
-              disableDefaultUI: true,
-              zoomControl: true,
-              styles: mapStyle // Optional: Custom dark/clean styles
-            }}
-          >
-            {coords && (
-              <Marker 
-                position={coords} 
-                animation={window.google.maps.Animation.DROP}
-              />
-            )}
-          </GoogleMap>
-        </>
-      )}
+      {isLoaded ? 
+               <>
+                 <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                   {coords 
+                     ? `Selected: ${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}` 
+                     : "Click the map to set workshop origin"}
+                 </Typography>
+                 <GoogleMap
+                   mapContainerStyle={containerStyle}
+                   center={coords || center}
+                   zoom={14}
+                   onClick={onMapClick}
+                   options={{
+                     disableDefaultUI: true,
+                     zoomControl: true,
+                     styles: mapStyle // Optional: Custom dark/clean styles
+                   }}
+                 >
+                   {coords && (
+                     <Marker 
+                       position={coords} 
+                       animation={window.google.maps.Animation.DROP}
+                     />
+                   )}
+                 </GoogleMap>
+               </>
+              : 
+               <Skeleton variant="rectangular" sx={{ ...containerStyle }} />}
     </Box>
   );
 };
