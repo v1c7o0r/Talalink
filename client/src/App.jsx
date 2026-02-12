@@ -11,7 +11,7 @@ import Home from "./pages/Home";
 import Maintenance from "./pages/Maintenance";
 import CreateListing from "./components/Forms/CreateListing"; // Added CreateListing
 import Footer from "./components/Layout/Footer";
-
+import ProductDetail from "./pages/ProductDetail";
 /**
  * Main Application Component
  */
@@ -35,7 +35,7 @@ export default function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
-          
+          <Route path="/product/:id" element={<ProductDetail />} />
           {/* --- PROTECTED ROUTES --- */}
           {/* Redirect to login if not authenticated */}
           

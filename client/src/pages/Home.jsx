@@ -1,20 +1,25 @@
 import { useState, useEffect } from 'react'; 
 import { 
   Box, Container, Grid, Typography, TextField, 
-  InputAdornment, Chip, Stack, Card, CardMedia, 
-  CardContent, CardActions, Button, CircularProgress 
+  InputAdornment, Chip, Stack, CircularProgress, Fab, Tooltip 
 } from '@mui/material';
-import { Search, LocationOn, Build, ShoppingBag, ErrorOutline } from '@mui/icons-material';
+import { Search, ErrorOutline, Add as AddIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
-// Keeping your exact naming convention and path
+// Component Imports
 import NavBar from '../components/Layout/NavBar'; 
+import ListingCard from '../components/Forms/ListingCard'; // Integrated the new card
 
 const Home = () => {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState('All');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Check if user is logged in for FAB visibility
+  const token = localStorage.getItem('token');
 
   // Fetch data from Flask API
   useEffect(() => {
@@ -100,56 +105,36 @@ const Home = () => {
           </Typography>
         )}
 
-        {/* Results Grid */}
+        {/* Results Grid - Now using the ListingCard component */}
         <Grid container spacing={3}>
           {!loading && !error && filteredItems.map((item) => (
             <Grid item xs={12} sm={6} md={4} key={item.id}>
-              <Card sx={{ 
-                borderRadius: 4, 
-                bgcolor: 'background.paper', 
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                transition: 'transform 0.2s',
-                '&:hover': { transform: 'translateY(-5px)' }
-              }}>
-                <CardMedia
-                  component="img"
-                  height="200"
-                  // Default image if none provided by backend
-                  image={item.image_url || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60"}
-                  alt={item.title}
-                />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-                    <Chip 
-                      icon={item.category === 'Service' ? <Build sx={{ fontSize: '14px !important' }}/> : <ShoppingBag sx={{ fontSize: '14px !important' }}/>} 
-                      label={item.category} 
-                      size="small" 
-                      color="primary" 
-                      variant="outlined" 
-                    />
-                    <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center' }}>
-                      <LocationOn sx={{ fontSize: 16, mr: 0.5 }} /> {item.location || 'Thika'}
-                    </Typography>
-                  </Stack>
-                  <Typography variant="h6" fontWeight={700} noWrap>
-                    {item.title}
-                  </Typography>
-                  <Typography variant="h5" color="primary" fontWeight={800} sx={{ mt: 1 }}>
-                    KES {item.price.toLocaleString()}
-                  </Typography>
-                </CardContent>
-                <CardActions sx={{ p: 2, pt: 0 }}>
-                  <Button variant="contained" fullWidth sx={{ borderRadius: 2, fontWeight: 700 }}>
-                    {item.category === 'Service' ? 'Request Service' : 'View Details'}
-                  </Button>
-                </CardActions>
-              </Card>
+              <ListingCard item={item} />
             </Grid>
           ))}
         </Grid>
       </Container>
+
+      {/* Floating Action Button - Only visible if logged in */}
+      {token && (
+        <Tooltip title="Add New Listing" placement="left">
+          <Fab 
+            color="primary" 
+            aria-label="add" 
+            onClick={() => navigate('/create-listing')}
+            sx={{ 
+              position: 'fixed', 
+              bottom: 32, 
+              right: 32,
+              boxShadow: 4,
+              '&:hover': { transform: 'scale(1.1)' },
+              transition: '0.2s'
+            }}
+          >
+            <AddIcon />
+          </Fab>
+        </Tooltip>
+      )}
     </Box>
   );
 };
